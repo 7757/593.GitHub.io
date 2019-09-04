@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <title>死信、延迟、重试队列 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="死信队列DLQ(Deal Letter Queue)，死信队列。当一个消息在队列中变成死信之后，他能被重新发送到 DLQ 中，与 DLQ 绑定到队列就是死信队列。 什么情况下需要死信队列 消息被拒绝 消息过期 队列达到最大长度   生产者生产一条消息，存储到普通队列中；设置队列的过期时间为 10 秒，在 10 秒内没有消费者消费消息，那么判定消息过期；此时如果设置了死信队列，过期消息被丢给死信队列">
+<meta name="keywords" content="基础,Java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="死信、延迟、重试队列">
+<meta property="og:url" content="http://yoursite.com/2017/08/02/死信信、延迟、重试队列/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="死信队列DLQ(Deal Letter Queue)，死信队列。当一个消息在队列中变成死信之后，他能被重新发送到 DLQ 中，与 DLQ 绑定到队列就是死信队列。 什么情况下需要死信队列 消息被拒绝 消息过期 队列达到最大长度   生产者生产一条消息，存储到普通队列中；设置队列的过期时间为 10 秒，在 10 秒内没有消费者消费消息，那么判定消息过期；此时如果设置了死信队列，过期消息被丢给死信队列">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://yoursite.com/images/sixinduilie.jpg">
+<meta property="og:updated_time" content="2017-11-02T10:53:21.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="死信、延迟、重试队列">
+<meta name="twitter:description" content="死信队列DLQ(Deal Letter Queue)，死信队列。当一个消息在队列中变成死信之后，他能被重新发送到 DLQ 中，与 DLQ 绑定到队列就是死信队列。 什么情况下需要死信队列 消息被拒绝 消息过期 队列达到最大长度   生产者生产一条消息，存储到普通队列中；设置队列的过期时间为 10 秒，在 10 秒内没有消费者消费消息，那么判定消息过期；此时如果设置了死信队列，过期消息被丢给死信队列">
+<meta name="twitter:image" content="http://yoursite.com/images/sixinduilie.jpg">
+  
+  <link rel="stylesheet" href="/css/index.css">
+</head>
+</html>
+<body style="
+
+
+  background-color: #eff0f6
+
+">
+  <div id="container">
+    <nav id="nav">
+  <header class="header">
+    <a href="/" class="title">7757 BOLG</a>
+  </header>
+  <div class="ctnWrap">
+    <div class="icons">
+      
+        
+          
+            <a href="https://weibo.com/u/6236494909?is_hot=1" target="_blank" class="nav-icn iconfont icon-weibo"></a>
+          
+        
+          
+            <a href="https://www.zhihu.com/people/7757-43-90/activities" target="_blank" class="nav-icn iconfont icon-zhihu"></a>
+          
+        
+      
+    </div>
+    <div class="menu">
+      
+        
+            <a href="/" class="nav-menu ">HOME</a>
+          
+        
+            <a href="/archives" class="nav-menu ">ARCHIVE</a>
+          
+        
+            <a href="/about" class="nav-menu ">ABOUT</a>
+          
+        
+      
+    </div>
+  </div>
+</nav>
+    <div id="main"><section class="article">
+  <h2 class="title">死信、延迟、重试队列</h2>
+  <p class="sub">Aug 2, 2017</p>
+  <article class="content">
+    <h2 id="死信队列"><a href="#死信队列" class="headerlink" title="死信队列"></a>死信队列</h2><p>DLQ(Deal Letter Queue)，死信队列。当一个消息在队列中变成死信之后，他能被重新发送到 DLQ 中，与 DLQ 绑定到队列就是死信队列。</p>
+<h3 id="什么情况下需要死信队列"><a href="#什么情况下需要死信队列" class="headerlink" title="什么情况下需要死信队列"></a>什么情况下需要死信队列</h3><ul>
+<li>消息被拒绝</li>
+<li>消息过期</li>
+<li>队列达到最大长度</li>
+</ul>
+<p><img src="https://www.funtl.com/assets1/Lusifer_2019011502260001.png" alt="img"></p>
+<p>生产者生产一条消息，存储到普通队列中；设置队列的过期时间为 10 秒，在 10 秒内没有消费者消费消息，那么判定消息过期；此时如果设置了死信队列，过期消息被丢给死信队列交换机，然后被存储在死信队列中。</p>
+<h2 id="延迟队列"><a href="#延迟队列" class="headerlink" title="延迟队列"></a>延迟队列</h2><p>顾名思义就是延迟执行消息，比如我们可以增加一个队列并设置其超时时间为 10 秒并且不设置任何消费者，等到消息超时，我们可以将消息放入死信队列，让消费者监听这个死信队列就达到了延迟队列的效果。</p>
+<h2 id="重试队列"><a href="#重试队列" class="headerlink" title="重试队列"></a>重试队列</h2><p>重试的消息在延迟的某个时间点（业务可设置）后，再次投递给消费者。而如果一直这样重复消费都持续失败到一定次数，就会投递到死信队列，最后需要进行人工干预。</p>
+
+  </article>
+  <footer class="f-cf">
+    
+      <a href="/2017/12/02/JavaScript-this-关键字/" class="link f-fl">⟵JavaScript this 关键字</a>
+    
+    
+      <a href="/2017/08/02/MySQL优化/" class="link f-fr">MySQL优化⟶</a>
+    
+  </footer>
+</section></div>
+    <footer id="footer" class="f-cf">
+  Email:1208087904@qq.com
+  
+    
+      
+        · <a href="https://weibo.com/u/6236494909?is_hot=1" target="_blank" class="nav-icn">WeiBo</a>
+      
+    
+      
+        · <a href="https://www.zhihu.com/people/7757-43-90/activities" target="_blank" class="nav-icn">ZhiHu</a>
+      
+    
+  
+  <span class="copyright">All rights reserved @7757</span>
+</footer>
+  </div>
+</body>
+</html>

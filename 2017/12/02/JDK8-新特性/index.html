@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <title>JDK8 新特性 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="概述以下列出两点重要特性：  Lambda 表达式（匿名函数） Stream 多线程并行数据处理（重要）  新特性 接口的默认方法只需要使用 default 关键字即可，这个特征又叫做 扩展方法 Lambda 表达式 Functional 接口 函数式接口 是指仅仅只包含一个抽象方法的接口，每一个该类型的 Lambda 表达式都会被匹配到这个抽象方法。你只需要给你的接口添加 @Functional">
+<meta name="keywords" content="基础,Java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JDK8 新特性">
+<meta property="og:url" content="http://yoursite.com/2017/12/02/JDK8-新特性/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="概述以下列出两点重要特性：  Lambda 表达式（匿名函数） Stream 多线程并行数据处理（重要）  新特性 接口的默认方法只需要使用 default 关键字即可，这个特征又叫做 扩展方法 Lambda 表达式 Functional 接口 函数式接口 是指仅仅只包含一个抽象方法的接口，每一个该类型的 Lambda 表达式都会被匹配到这个抽象方法。你只需要给你的接口添加 @Functional">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://yoursite.com/images/java8_logo.png">
+<meta property="og:updated_time" content="2017-01-02T10:53:21.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JDK8 新特性">
+<meta name="twitter:description" content="概述以下列出两点重要特性：  Lambda 表达式（匿名函数） Stream 多线程并行数据处理（重要）  新特性 接口的默认方法只需要使用 default 关键字即可，这个特征又叫做 扩展方法 Lambda 表达式 Functional 接口 函数式接口 是指仅仅只包含一个抽象方法的接口，每一个该类型的 Lambda 表达式都会被匹配到这个抽象方法。你只需要给你的接口添加 @Functional">
+<meta name="twitter:image" content="http://yoursite.com/images/java8_logo.png">
+  
+  <link rel="stylesheet" href="/css/index.css">
+</head>
+</html>
+<body style="
+
+
+  background-color: #eff0f6
+
+">
+  <div id="container">
+    <nav id="nav">
+  <header class="header">
+    <a href="/" class="title">7757 BOLG</a>
+  </header>
+  <div class="ctnWrap">
+    <div class="icons">
+      
+        
+          
+            <a href="https://weibo.com/u/6236494909?is_hot=1" target="_blank" class="nav-icn iconfont icon-weibo"></a>
+          
+        
+          
+            <a href="https://www.zhihu.com/people/7757-43-90/activities" target="_blank" class="nav-icn iconfont icon-zhihu"></a>
+          
+        
+      
+    </div>
+    <div class="menu">
+      
+        
+            <a href="/" class="nav-menu ">HOME</a>
+          
+        
+            <a href="/archives" class="nav-menu ">ARCHIVE</a>
+          
+        
+            <a href="/about" class="nav-menu ">ABOUT</a>
+          
+        
+      
+    </div>
+  </div>
+</nav>
+    <div id="main"><section class="article">
+  <h2 class="title">JDK8 新特性</h2>
+  <p class="sub">Dec 2, 2017</p>
+  <article class="content">
+    <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>以下列出两点重要特性：</p>
+<ul>
+<li>Lambda 表达式（匿名函数）</li>
+<li>Stream 多线程并行数据处理（重要）</li>
+</ul>
+<h2 id="新特性"><a href="#新特性" class="headerlink" title="新特性"></a>新特性</h2><ul>
+<li>接口的默认方法只需要使用 <code>default</code> 关键字即可，这个特征又叫做 <strong>扩展方法</strong></li>
+<li>Lambda 表达式</li>
+<li>Functional 接口 <strong>函数式接口</strong> 是指仅仅只包含一个抽象方法的接口，每一个该类型的 Lambda 表达式都会被匹配到这个抽象方法。你只需要给你的接口添加 <code>@FunctionalInterface</code> 注解</li>
+<li>使用 <code>::</code> 双冒号关键字来传递方法(静态方法和非静态方法)</li>
+<li>Predicate 接口和 Lambda 表达式</li>
+<li>Function 接口<ul>
+<li>Function 有一个参数并且返回一个结果，并附带了一些可以和其他函数组合的默认方法</li>
+<li>compose 方法表示在某个方法之前执行</li>
+<li>andThen 方法表示在某个方法之后执行</li>
+<li>注意：compose 和 andThen 方法调用之后都会把对象自己本身返回，这可以 <strong>方便链式编程</strong></li>
+</ul>
+</li>
+<li>Supplier 接口，返回一个任意范型的值，和 Function 接口不同的是该接口 <strong>没有任何参数</strong></li>
+<li>Consumer 接口，接收一个任意范型的值，和 Function 接口不同的是该接口 <strong>没有任何值</strong></li>
+<li>Optional 类<ul>
+<li>Optional 不是接口而是一个类，这是个用来防止 <code>NullPointerException</code> 异常的辅助类型</li>
+<li>Optional 被定义为一个简单的容器，其值可能是 null 或者不是 null。</li>
+<li>在 Java8 之前一般某个函数应该返回非空对象但是偶尔却可能返回了 null，而在 Java8 中，不推荐你返回 null 而是返回 Optional。</li>
+<li>这是一个可以为 null 的容器对象。</li>
+<li>如果值存在则 <code>isPresent()</code> 方法会返回 true，调用 <code>get()</code> 方法会返回该对象。</li>
+</ul>
+</li>
+</ul>
+<h2 id="小栗子"><a href="#小栗子" class="headerlink" title="小栗子"></a>小栗子</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.funtl.jdk8.feature.lambda;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"><span class="keyword">import</span> java.util.stream.Collectors;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Lambda 基本用法</span></span><br><span class="line"><span class="comment"> * &lt;p&gt;Title: BaseLambda&lt;/p&gt;</span></span><br><span class="line"><span class="comment"> * &lt;p&gt;Description: &lt;/p&gt;</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Lusifer</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@version</span> 1.0.0</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2019/1/6 10:42</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BaseLambda</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        testForeach();</span><br><span class="line">        testStreamDuplicates();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Lambda 遍历</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">testForeach</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 定义一个数组</span></span><br><span class="line">        String[] array = &#123;</span><br><span class="line">                <span class="string">"尼尔机械纪元"</span>,</span><br><span class="line">                <span class="string">"关于我转生成为史莱姆这件事"</span>,</span><br><span class="line">                <span class="string">"实力至上主义教师"</span>,</span><br><span class="line">                <span class="string">"地狱少女"</span></span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 转换成集合</span></span><br><span class="line">        List&lt;String&gt; acgs = Arrays.asList(array);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 传统的遍历方式</span></span><br><span class="line">        System.out.println(<span class="string">"传统的遍历方式："</span>);</span><br><span class="line">        <span class="keyword">for</span> (String acg : acgs) &#123;</span><br><span class="line">            System.out.println(acg);</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 使用 Lambda 表达式以及函数操作(functional operation)</span></span><br><span class="line">        System.out.println(<span class="string">"Lambda 表达式以及函数操作："</span>);</span><br><span class="line">        acgs.forEach((acg) -&gt; System.out.println(acg));</span><br><span class="line">        System.out.println();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 在 Java 8 中使用双冒号操作符(double colon operator)</span></span><br><span class="line">        System.out.println(<span class="string">"使用双冒号操作符："</span>);</span><br><span class="line">        acgs.forEach(System.out::println);</span><br><span class="line">        System.out.println();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Stream 去重复</span></span><br><span class="line"><span class="comment">     * String 和 Integer 可以使用该方法去重</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">testStreamDuplicates</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Stream 去重复："</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 定义一个数组</span></span><br><span class="line">        String[] array = &#123;</span><br><span class="line">                <span class="string">"尼尔机械纪元"</span>,</span><br><span class="line">                <span class="string">"尼尔机械纪元"</span>,</span><br><span class="line">                <span class="string">"关于我转生成为史莱姆这件事"</span>,</span><br><span class="line">                <span class="string">"关于我转生成为史莱姆这件事"</span>,</span><br><span class="line">                <span class="string">"实力至上主义教师"</span>,</span><br><span class="line">                <span class="string">"实力至上主义教师"</span>,</span><br><span class="line">                <span class="string">"地狱少女"</span>,</span><br><span class="line">                <span class="string">"地狱少女"</span></span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 转换成集合</span></span><br><span class="line">        List&lt;String&gt; acgs = Arrays.asList(array);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Stream 去重复</span></span><br><span class="line">        acgs = acgs.stream().distinct().collect(Collectors.toList());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 打印</span></span><br><span class="line">        acgs.forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+  </article>
+  <footer class="f-cf">
+    
+    
+      <a href="/2017/12/02/JavaScript-this-关键字/" class="link f-fr">JavaScript this 关键字⟶</a>
+    
+  </footer>
+</section></div>
+    <footer id="footer" class="f-cf">
+  Email:1208087904@qq.com
+  
+    
+      
+        · <a href="https://weibo.com/u/6236494909?is_hot=1" target="_blank" class="nav-icn">WeiBo</a>
+      
+    
+      
+        · <a href="https://www.zhihu.com/people/7757-43-90/activities" target="_blank" class="nav-icn">ZhiHu</a>
+      
+    
+  
+  <span class="copyright">All rights reserved @7757</span>
+</footer>
+  </div>
+</body>
+</html>
