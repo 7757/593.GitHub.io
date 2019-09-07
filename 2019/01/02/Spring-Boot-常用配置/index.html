@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <title>Spring Boot 常用配置 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="概述本章节主要介绍一下 Spring Boot 中的一些常用配置，比如：自定义 Banner、配置日志、关闭特定的自动配置等。 自定义 Banner在 Spring Boot 启动的时候会有一个默认的启动图案 1234567  .   ____          _            __ _ _ /\\ / ___&amp;apos;_ __ _ _(_)_ __  __ _ \ \ \ \( (">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring Boot 常用配置">
+<meta property="og:url" content="http://yoursite.com/2019/01/02/Spring-Boot-常用配置/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="概述本章节主要介绍一下 Spring Boot 中的一些常用配置，比如：自定义 Banner、配置日志、关闭特定的自动配置等。 自定义 Banner在 Spring Boot 启动的时候会有一个默认的启动图案 1234567  .   ____          _            __ _ _ /\\ / ___&amp;apos;_ __ _ _(_)_ __  __ _ \ \ \ \( (">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://yoursite.com/images/spring-boot.jpg">
+<meta property="og:updated_time" content="2019-09-07T12:34:02.957Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spring Boot 常用配置">
+<meta name="twitter:description" content="概述本章节主要介绍一下 Spring Boot 中的一些常用配置，比如：自定义 Banner、配置日志、关闭特定的自动配置等。 自定义 Banner在 Spring Boot 启动的时候会有一个默认的启动图案 1234567  .   ____          _            __ _ _ /\\ / ___&amp;apos;_ __ _ _(_)_ __  __ _ \ \ \ \( (">
+<meta name="twitter:image" content="http://yoursite.com/images/spring-boot.jpg">
+  
+  <link rel="stylesheet" href="/css/index.css">
+</head>
+</html>
+<body style="
+
+
+  background-color: #eff0f6
+
+">
+  <div id="container">
+    <nav id="nav">
+  <header class="header">
+    <a href="/" class="title">7757 BOLG</a>
+  </header>
+  <div class="ctnWrap">
+    <div class="icons">
+      
+        
+          
+            <a href="https://weibo.com/u/6236494909?is_hot=1 || weibo" target="_blank" class="nav-icn iconfont icon-weibo"></a>
+          
+        
+          
+            <a href="https://www.zhihu.com/people/7757-43-90/activities" target="_blank" class="nav-icn iconfont icon-zhihu"></a>
+          
+        
+      
+    </div>
+    <div class="menu">
+      
+        
+            <a href="/" class="nav-menu ">HOME</a>
+          
+        
+            <a href="/archives" class="nav-menu ">ARCHIVE</a>
+          
+        
+            <a href="/about" class="nav-menu ">ABOUT</a>
+          
+        
+      
+    </div>
+  </div>
+</nav>
+    <div id="main"><section class="article">
+  <h2 class="title">Spring Boot 常用配置</h2>
+  <p class="sub">Jan 2, 2019</p>
+  <article class="content">
+    <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>本章节主要介绍一下 Spring Boot 中的一些常用配置，比如：自定义 Banner、配置日志、关闭特定的自动配置等。</p>
+<h2 id="自定义-Banner"><a href="#自定义-Banner" class="headerlink" title="自定义 Banner"></a>自定义 Banner</h2><p>在 Spring Boot 启动的时候会有一个默认的启动图案</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">  .   ____          _            __ _ _</span><br><span class="line"> /\\ / ___&apos;_ __ _ _(_)_ __  __ _ \ \ \ \</span><br><span class="line">( ( )\___ | &apos;_ | &apos;_| | &apos;_ \/ _` | \ \ \ \</span><br><span class="line"> \\/  ___)| |_)| | | | | || (_| |  ) ) ) )</span><br><span class="line">  &apos;  |____| .__|_| |_|_| |_\__, | / / / /</span><br><span class="line"> =========|_|==============|___/=/_/_/_/</span><br><span class="line"> :: Spring Boot ::        (v1.5.8.RELEASE)</span><br></pre></td></tr></table></figure>
+
+<p>我们在 <code>src/main/resources</code> 目录下新建一个 banner.txt</p>
+<p>通过 <a href="http://patorjk.com/software/taag" target="_blank" rel="noopener">http://patorjk.com/software/taag</a> 网站生成字符串，将网站生成的字符复制到 banner.txt 中</p>
+<p>再次运行这个程序</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">$&#123;AnsiColor.BRIGHT_RED&#125;</span><br><span class="line">////////////////////////////////////////////////////////////////////</span><br><span class="line">//                          _ooOoo_                               //</span><br><span class="line">//                         o8888888o                              //</span><br><span class="line">//                         88&quot; . &quot;88                              //</span><br><span class="line">//                         (| ^_^ |)                              //</span><br><span class="line">//                         O\  =  /O                              //</span><br><span class="line">//                      ____/`---&apos;\____                           //</span><br><span class="line">//                    .&apos;  \\|     |//  `.                         //</span><br><span class="line">//                   /  \\|||  :  |||//  \                        //</span><br><span class="line">//                  /  _||||| -:- |||||-  \                       //</span><br><span class="line">//                  |   | \\\  -  /// |   |                       //</span><br><span class="line">//                  | \_|  &apos;&apos;\---/&apos;&apos;  |   |                       //</span><br><span class="line">//                  \  .-\__  `-`  ___/-. /                       //</span><br><span class="line">//                ___`. .&apos;  /--.--\  `. . ___                     //</span><br><span class="line">//              .&quot;&quot; &apos;&lt;  `.___\_&lt;|&gt;_/___.&apos;  &gt;&apos;&quot;&quot;.                  //</span><br><span class="line">//            | | :  `- \`.;`\ _ /`;.`/ - ` : | |                 //</span><br><span class="line">//            \  \ `-.   \_ __\ /__ _/   .-` /  /                 //</span><br><span class="line">//      ========`-.____`-.___\_____/___.-`____.-&apos;========         //</span><br><span class="line">//                           `=---=&apos;                              //</span><br><span class="line">//      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^        //</span><br><span class="line">//            佛祖保佑       永不宕机     永无BUG                  //</span><br><span class="line">////////////////////////////////////////////////////////////////////</span><br></pre></td></tr></table></figure>
+
+<p>常用属性设置：</p>
+<ul>
+<li><code>${AnsiColor.BRIGHT_RED}</code>：设置控制台中输出内容的颜色</li>
+<li><code>${application.version}</code>：用来获取 <code>MANIFEST.MF</code> 文件中的版本号</li>
+<li><code>${application.formatted-version}</code>：格式化后的 <code>${application.version}</code> 版本信息</li>
+<li><code>${spring-boot.version}</code>：Spring Boot 的版本号</li>
+<li><code>${spring-boot.formatted-version}</code>：格式化后的 <code>${spring-boot.version}</code> 版本信息</li>
+</ul>
+<h2 id="配置文件"><a href="#配置文件" class="headerlink" title="配置文件"></a>配置文件</h2><p>Spring Boot 项目使用一个全局的配置文件 <code>application.properties</code> 或者是 <code>application.yml</code>，在 <code>resources</code> 目录下或者类路径下的 <code>/config</code> 下，一般我们放到 <code>resources</code> 下。</p>
+<p>修改 Tomcat 的端口为 9090，并将默认的访问路径 “/“ 修改为 “boot”，可以在 <code>application.properties</code> 中添加：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">server.port=9090</span><br><span class="line">server.context-path=/boot</span><br></pre></td></tr></table></figure>
+
+<p>1<br>2</p>
+<p>或在 application.yml 中添加：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">server:</span><br><span class="line">  port: 9090</span><br><span class="line">  context-path: /boot</span><br></pre></td></tr></table></figure>
+
+<p>测试效果：</p>
+<p><img src="https://www.funtl.com/assets/Lusifer1509896204.png" alt="img"></p>
+<p><a href="https://docs.spring.io/spring-boot/docs/2.0.2.RELEASE/reference/html/common-application-properties.html" target="_blank" rel="noopener">更多配置</a></p>
+<h2 id="Starter-POM"><a href="#Starter-POM" class="headerlink" title="Starter POM"></a>Starter POM</h2><p>Spring Boot 为我们提供了简化企业级开发绝大多数场景的 starter pom ，只要使用了应用场景所需要的 starter pom ，相关的技术配置将会消除，就可以得到 Spring Boot 为我们提供的自动配置的 Bean。</p>
+<p><a href="https://docs.spring.io/spring-boot/docs/2.0.2.RELEASE/reference/html/using-boot-build-systems.html#using-boot-starter" target="_blank" rel="noopener">更多 Starter POM</a></p>
+<h2 id="日志配置"><a href="#日志配置" class="headerlink" title="日志配置"></a>日志配置</h2><p>Spring Boot 对各种日志框架都做了支持，我们可以通过配置来修改默认的日志的配置</p>
+<p>默认情况下，Spring Boot 使用 Logback 作为日志框架</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">logging:</span></span><br><span class="line"><span class="attr">  file:</span> <span class="string">../logs/spring-boot-hello.log</span></span><br><span class="line">  <span class="string">level.org.springframework.web:</span> <span class="string">DEBUG</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="关闭特定的自动配置"><a href="#关闭特定的自动配置" class="headerlink" title="关闭特定的自动配置"></a>关闭特定的自动配置</h2><p>关闭特定的自动配置使用 <code>@SpringBootApplication</code> 注解的 <code>exclude</code> 参数即可，这里以关闭数据源的自动配置为例</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootApplication</span>(exclude = &#123;DataSourceAutoConfiguration.class&#125;)</span><br></pre></td></tr></table></figure>
+  </article>
+  <footer class="f-cf">
+    
+      <a href="/2019/04/01/Dubbo-的负载均衡/" class="link f-fl">⟵Dubbo 的负载均衡</a>
+    
+    
+      <a href="/2018/12/02/Zookeeper-如何实现分布式锁/" class="link f-fr">Zookeeper 如何实现分布式锁⟶</a>
+    
+  </footer>
+</section></div>
+    <footer id="footer" class="f-cf">
+  Email:1208087904@qq.com
+  
+    
+      
+        · <a href="https://weibo.com/u/6236494909?is_hot=1 || weibo" target="_blank" class="nav-icn">WeiBo</a>
+      
+    
+      
+        · <a href="https://www.zhihu.com/people/7757-43-90/activities" target="_blank" class="nav-icn">ZhiHu</a>
+      
+    
+  
+  <span class="copyright">All rights reserved @7757</span>
+</footer>
+  </div>
+</body>
+</html>

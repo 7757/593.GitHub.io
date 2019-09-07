@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <title>Dubbo Hystrix 实现服务熔断 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="熔断器简介在微服务架构中，根据业务来拆分成一个个的服务，服务与服务之间可以通过 RPC 相互调用。为了保证其高可用，单个服务通常会集群部署。由于网络原因或者自身的原因，服务并不能保证 100% 可用，如果单个服务出现问题，调用这个服务就会出现线程阻塞，此时若有大量的请求涌入，Servlet 容器的线程资源会被消耗完毕，导致服务瘫痪。服务与服务之间的依赖性，故障会传播，会对整个微服务系统造成灾难性的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Dubbo Hystrix 实现服务熔断">
+<meta property="og:url" content="http://yoursite.com/2019/04/03/Dubbo-Hystrix-实现服务熔断/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="熔断器简介在微服务架构中，根据业务来拆分成一个个的服务，服务与服务之间可以通过 RPC 相互调用。为了保证其高可用，单个服务通常会集群部署。由于网络原因或者自身的原因，服务并不能保证 100% 可用，如果单个服务出现问题，调用这个服务就会出现线程阻塞，此时若有大量的请求涌入，Servlet 容器的线程资源会被消耗完毕，导致服务瘫痪。服务与服务之间的依赖性，故障会传播，会对整个微服务系统造成灾难性的">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://yoursite.com/images/hystrix11.jpg">
+<meta property="og:updated_time" content="2019-09-07T13:02:47.289Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Dubbo Hystrix 实现服务熔断">
+<meta name="twitter:description" content="熔断器简介在微服务架构中，根据业务来拆分成一个个的服务，服务与服务之间可以通过 RPC 相互调用。为了保证其高可用，单个服务通常会集群部署。由于网络原因或者自身的原因，服务并不能保证 100% 可用，如果单个服务出现问题，调用这个服务就会出现线程阻塞，此时若有大量的请求涌入，Servlet 容器的线程资源会被消耗完毕，导致服务瘫痪。服务与服务之间的依赖性，故障会传播，会对整个微服务系统造成灾难性的">
+<meta name="twitter:image" content="http://yoursite.com/images/hystrix11.jpg">
+  
+  <link rel="stylesheet" href="/css/index.css">
+</head>
+</html>
+<body style="
+
+
+  background-color: #eff0f6
+
+">
+  <div id="container">
+    <nav id="nav">
+  <header class="header">
+    <a href="/" class="title">7757 BOLG</a>
+  </header>
+  <div class="ctnWrap">
+    <div class="icons">
+      
+        
+          
+            <a href="https://weibo.com/u/6236494909?is_hot=1 || weibo" target="_blank" class="nav-icn iconfont icon-weibo"></a>
+          
+        
+          
+            <a href="https://www.zhihu.com/people/7757-43-90/activities" target="_blank" class="nav-icn iconfont icon-zhihu"></a>
+          
+        
+      
+    </div>
+    <div class="menu">
+      
+        
+            <a href="/" class="nav-menu ">HOME</a>
+          
+        
+            <a href="/archives" class="nav-menu ">ARCHIVE</a>
+          
+        
+            <a href="/about" class="nav-menu ">ABOUT</a>
+          
+        
+      
+    </div>
+  </div>
+</nav>
+    <div id="main"><section class="article">
+  <h2 class="title">Dubbo Hystrix 实现服务熔断</h2>
+  <p class="sub">Apr 3, 2019</p>
+  <article class="content">
+    <h2 id="熔断器简介"><a href="#熔断器简介" class="headerlink" title="熔断器简介"></a>熔断器简介</h2><p>在微服务架构中，根据业务来拆分成一个个的服务，服务与服务之间可以通过 <code>RPC</code> 相互调用。为了保证其高可用，单个服务通常会集群部署。由于网络原因或者自身的原因，服务并不能保证 100% 可用，如果单个服务出现问题，调用这个服务就会出现线程阻塞，此时若有大量的请求涌入，<code>Servlet</code> 容器的线程资源会被消耗完毕，导致服务瘫痪。服务与服务之间的依赖性，故障会传播，会对整个微服务系统造成灾难性的严重后果，这就是服务故障的 <strong>“雪崩”</strong> 效应。</p>
+<p>为了解决这个问题，业界提出了熔断器模型。</p>
+<p>Netflix 开源了 Hystrix 组件，实现了熔断器模式，Spring Cloud 对这一组件进行了整合。在微服务架构中，一个请求需要调用多个服务是非常常见的，如下图：</p>
+<p><img src="https://www.funtl.com/assets/Lusifer201805292246007.png" alt="img"></p>
+<p>较底层的服务如果出现故障，会导致连锁故障。当对特定的服务的调用的不可用达到一个阀值（Hystrix 是 <strong>5 秒 20 次</strong>） 熔断器将会被打开。</p>
+<p><img src="https://www.funtl.com/assets/Lusifer201805292246008.png" alt="img"></p>
+<p>熔断器打开后，为了避免连锁故障，通过 <code>fallback</code> 方法可以直接返回一个固定值。</p>
+<h2 id="Dubbo-Provider-中使用熔断器"><a href="#Dubbo-Provider-中使用熔断器" class="headerlink" title="Dubbo Provider 中使用熔断器"></a>Dubbo Provider 中使用熔断器</h2><h3 id="在-pom-xml-中增加依赖"><a href="#在-pom-xml-中增加依赖" class="headerlink" title="在 pom.xml 中增加依赖"></a>在 <code>pom.xml</code> 中增加依赖</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;spring-cloud-starter-netflix-hystrix&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;2.0.1.RELEASE&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+
+<p>###在 Application 中增加 <code>@EnableHystrix</code> 注解</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">package com.funtl.hello.dubbo.service.user.provider;</span><br><span class="line"></span><br><span class="line">import com.alibaba.dubbo.container.Main;</span><br><span class="line">import org.springframework.boot.SpringApplication;</span><br><span class="line">import org.springframework.boot.autoconfigure.SpringBootApplication;</span><br><span class="line">import org.springframework.cloud.netflix.hystrix.EnableHystrix;</span><br><span class="line"></span><br><span class="line">@EnableHystrix</span><br><span class="line">@SpringBootApplication</span><br><span class="line">public class HelloDubboServiceUserProviderApplication &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        SpringApplication.run(HelloDubboServiceUserProviderApplication.class, args);</span><br><span class="line">        Main.main(args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="在-Service-中增加-HystrixCommand-注解"><a href="#在-Service-中增加-HystrixCommand-注解" class="headerlink" title="在 Service 中增加 @HystrixCommand 注解"></a>在 Service 中增加 <code>@HystrixCommand</code> 注解</h3><p>在调用方法上增加 <code>@HystrixCommand</code> 配置，此时调用会经过 Hystrix 代理</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">package com.funtl.hello.dubbo.service.user.provider.api.impl;</span><br><span class="line"></span><br><span class="line">import com.alibaba.dubbo.config.annotation.Service;</span><br><span class="line">import com.funtl.hello.dubbo.service.user.api.UserService;</span><br><span class="line">import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;</span><br><span class="line">import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;</span><br><span class="line">import org.springframework.beans.factory.annotation.Value;</span><br><span class="line"></span><br><span class="line">@Service(version = &quot;$&#123;user.service.version&#125;&quot;)</span><br><span class="line">public class UserServiceImpl implements UserService &#123;</span><br><span class="line"></span><br><span class="line">    @Value(&quot;$&#123;dubbo.protocol.port&#125;&quot;)</span><br><span class="line">    private String port;</span><br><span class="line"></span><br><span class="line">    @HystrixCommand(commandProperties = &#123;</span><br><span class="line">            @HystrixProperty(name = &quot;circuitBreaker.requestVolumeThreshold&quot;, value = &quot;10&quot;),</span><br><span class="line">            @HystrixProperty(name = &quot;execution.isolation.thread.timeoutInMilliseconds&quot;, value = &quot;2000&quot;)</span><br><span class="line">    &#125;)</span><br><span class="line">    @Override</span><br><span class="line">    public String sayHi() &#123;</span><br><span class="line">//        return &quot;Hello Dubbo, i am from port:&quot; + port;</span><br><span class="line">        throw new RuntimeException(&quot;Exception to show hystrix enabled.&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="测试熔断器"><a href="#测试熔断器" class="headerlink" title="测试熔断器"></a>测试熔断器</h3><p>此时我们再次请求服务提供者，浏览器会报 500 异常</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Exception to show hystrix enabled.</span><br></pre></td></tr></table></figure>
+
+<h2 id="Dubbo-Consumer-中使用熔断器"><a href="#Dubbo-Consumer-中使用熔断器" class="headerlink" title="Dubbo Consumer 中使用熔断器"></a>Dubbo Consumer 中使用熔断器</h2><h3 id="在-pom-xml-中增加依赖-1"><a href="#在-pom-xml-中增加依赖-1" class="headerlink" title="在 pom.xml 中增加依赖"></a>在 <code>pom.xml</code> 中增加依赖</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;spring-cloud-starter-netflix-hystrix&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;2.0.1.RELEASE&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="在-Application-中增加-EnableHystrix-注解"><a href="#在-Application-中增加-EnableHystrix-注解" class="headerlink" title="在 Application 中增加 @EnableHystrix 注解"></a>在 Application 中增加 <code>@EnableHystrix</code> 注解</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">package com.funtl.hello.dubbo.service.user.consumer;</span><br><span class="line"></span><br><span class="line">import org.springframework.boot.SpringApplication;</span><br><span class="line">import org.springframework.boot.autoconfigure.SpringBootApplication;</span><br><span class="line">import org.springframework.cloud.netflix.hystrix.EnableHystrix;</span><br><span class="line"></span><br><span class="line">@EnableHystrix</span><br><span class="line">@SpringBootApplication</span><br><span class="line">public class HelloDubboServiceUserConsumerApplication &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        SpringApplication.run(HelloDubboServiceUserConsumerApplication.class, args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="在调用方法上增加-HystrixCommand-注解，并指定-fallbackMethod-方法"><a href="#在调用方法上增加-HystrixCommand-注解，并指定-fallbackMethod-方法" class="headerlink" title="在调用方法上增加 @HystrixCommand 注解，并指定 fallbackMethod 方法"></a>在调用方法上增加 <code>@HystrixCommand</code> 注解，并指定 <code>fallbackMethod</code> 方法</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">package com.funtl.hello.dubbo.service.user.consumer.controller;</span><br><span class="line"></span><br><span class="line">import com.alibaba.dubbo.config.annotation.Reference;</span><br><span class="line">import com.funtl.hello.dubbo.service.user.api.UserService;</span><br><span class="line">import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;</span><br><span class="line">import org.springframework.web.bind.annotation.RequestMapping;</span><br><span class="line">import org.springframework.web.bind.annotation.RestController;</span><br><span class="line"></span><br><span class="line">@RestController</span><br><span class="line">public class UserController &#123;</span><br><span class="line"></span><br><span class="line">    @Reference(version = &quot;$&#123;user.service.version&#125;&quot;)</span><br><span class="line">    private UserService userService;</span><br><span class="line"></span><br><span class="line">    @HystrixCommand(fallbackMethod = &quot;hiError&quot;)</span><br><span class="line">    @RequestMapping(value = &quot;hi&quot;)</span><br><span class="line">    public String sayHi() &#123;</span><br><span class="line">        return userService.sayHi();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String hiError() &#123;</span><br><span class="line">        return &quot;Hystrix fallback&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="测试熔断器-1"><a href="#测试熔断器-1" class="headerlink" title="测试熔断器"></a>测试熔断器</h3><p>此时我们再次请求服务提供者，浏览器会显示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Hystrix fallback</span><br></pre></td></tr></table></figure>
+
+<p>至此，Dubbo + Hystrix 配置完成</p>
+
+  </article>
+  <footer class="f-cf">
+    
+      <a href="/2019/04/04/Dubbo-Hystrix-熔断器仪表盘/" class="link f-fl">⟵Dubbo + Hystrix 熔断器仪表盘</a>
+    
+    
+      <a href="/2019/04/02/Dubbo-Kryo-实现高速序列化/" class="link f-fr">Dubbo Kryo 实现高速序列化⟶</a>
+    
+  </footer>
+</section></div>
+    <footer id="footer" class="f-cf">
+  Email:1208087904@qq.com
+  
+    
+      
+        · <a href="https://weibo.com/u/6236494909?is_hot=1 || weibo" target="_blank" class="nav-icn">WeiBo</a>
+      
+    
+      
+        · <a href="https://www.zhihu.com/people/7757-43-90/activities" target="_blank" class="nav-icn">ZhiHu</a>
+      
+    
+  
+  <span class="copyright">All rights reserved @7757</span>
+</footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <title>Zookeeper 如何实现分布式锁 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="什么是临时顺序节点？ Zookeeper 的数据存储结构就像一棵树，这棵树由节点组成，这种节点叫做 Znode。 Znode 分为四种类型： 持久节点（PERSISTENT）默认的节点类型。创建节点的客户端与 Zookeeper 断开连接后，该节点依旧存在。 持久节点顺序节点（PERSISTENT_SEQUENTIAL）所谓顺序节点，就是在创建节点时，Zookeeper 根据创建的时间顺序给该节点">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Zookeeper 如何实现分布式锁">
+<meta property="og:url" content="http://yoursite.com/2018/12/02/Zookeeper-如何实现分布式锁/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="什么是临时顺序节点？ Zookeeper 的数据存储结构就像一棵树，这棵树由节点组成，这种节点叫做 Znode。 Znode 分为四种类型： 持久节点（PERSISTENT）默认的节点类型。创建节点的客户端与 Zookeeper 断开连接后，该节点依旧存在。 持久节点顺序节点（PERSISTENT_SEQUENTIAL）所谓顺序节点，就是在创建节点时，Zookeeper 根据创建的时间顺序给该节点">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://yoursite.com/images/Lusifer201810170001.png">
+<meta property="og:updated_time" content="2019-09-07T12:17:12.976Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Zookeeper 如何实现分布式锁">
+<meta name="twitter:description" content="什么是临时顺序节点？ Zookeeper 的数据存储结构就像一棵树，这棵树由节点组成，这种节点叫做 Znode。 Znode 分为四种类型： 持久节点（PERSISTENT）默认的节点类型。创建节点的客户端与 Zookeeper 断开连接后，该节点依旧存在。 持久节点顺序节点（PERSISTENT_SEQUENTIAL）所谓顺序节点，就是在创建节点时，Zookeeper 根据创建的时间顺序给该节点">
+<meta name="twitter:image" content="http://yoursite.com/images/Lusifer201810170001.png">
+  
+  <link rel="stylesheet" href="/css/index.css">
+</head>
+</html>
+<body style="
+
+
+  background-color: #eff0f6
+
+">
+  <div id="container">
+    <nav id="nav">
+  <header class="header">
+    <a href="/" class="title">7757 BOLG</a>
+  </header>
+  <div class="ctnWrap">
+    <div class="icons">
+      
+        
+          
+            <a href="https://weibo.com/u/6236494909?is_hot=1 || weibo" target="_blank" class="nav-icn iconfont icon-weibo"></a>
+          
+        
+          
+            <a href="https://www.zhihu.com/people/7757-43-90/activities" target="_blank" class="nav-icn iconfont icon-zhihu"></a>
+          
+        
+      
+    </div>
+    <div class="menu">
+      
+        
+            <a href="/" class="nav-menu ">HOME</a>
+          
+        
+            <a href="/archives" class="nav-menu ">ARCHIVE</a>
+          
+        
+            <a href="/about" class="nav-menu ">ABOUT</a>
+          
+        
+      
+    </div>
+  </div>
+</nav>
+    <div id="main"><section class="article">
+  <h2 class="title">Zookeeper 如何实现分布式锁</h2>
+  <p class="sub">Dec 2, 2018</p>
+  <article class="content">
+    <h2 id="什么是临时顺序节点？"><a href="#什么是临时顺序节点？" class="headerlink" title="什么是临时顺序节点？"></a>什么是临时顺序节点？</h2><p><img src="https://www.funtl.com/assets/Lusifer201810170010.png" alt="img"></p>
+<p>Zookeeper 的数据存储结构就像一棵树，这棵树由节点组成，这种节点叫做 Znode。</p>
+<p>Znode 分为四种类型：</p>
+<h3 id="持久节点（PERSISTENT）"><a href="#持久节点（PERSISTENT）" class="headerlink" title="持久节点（PERSISTENT）"></a>持久节点（PERSISTENT）</h3><p>默认的节点类型。创建节点的客户端与 Zookeeper 断开连接后，该节点依旧存在。</p>
+<h3 id="持久节点顺序节点（PERSISTENT-SEQUENTIAL）"><a href="#持久节点顺序节点（PERSISTENT-SEQUENTIAL）" class="headerlink" title="持久节点顺序节点（PERSISTENT_SEQUENTIAL）"></a>持久节点顺序节点（PERSISTENT_SEQUENTIAL）</h3><p>所谓顺序节点，就是在创建节点时，Zookeeper 根据创建的时间顺序给该节点名称进行编号：</p>
+<p><img src="https://www.funtl.com/assets/Lusifer201810190001.png" alt="img"></p>
+<h3 id="临时节点（EPHEMERAL）"><a href="#临时节点（EPHEMERAL）" class="headerlink" title="临时节点（EPHEMERAL）"></a>临时节点（EPHEMERAL）</h3><p>和持久节点相反，当创建节点的客户端与 Zookeeper 断开连接后，临时节点会被删除：</p>
+<p><img src="https://www.funtl.com/assets/Lusifer201810190002.png" alt="img"></p>
+<p><img src="https://www.funtl.com/assets/Lusifer201810190003.png" alt="img"></p>
+<p><img src="https://www.funtl.com/assets/Lusifer201810190004.png" alt="img"></p>
+<h3 id="临时顺序节点（EPHEMERAL-SEQUENTIAL）"><a href="#临时顺序节点（EPHEMERAL-SEQUENTIAL）" class="headerlink" title="临时顺序节点（EPHEMERAL_SEQUENTIAL）"></a>临时顺序节点（EPHEMERAL_SEQUENTIAL）</h3><p>顾名思义，临时顺序节点结合和临时节点和顺序节点的特点：在创建节点时，Zookeeper 根据创建的时间顺序给该节点名称进行编号；当创建节点的客户端与 Zookeeper 断开连接后，临时节点会被删除。</p>
+<h2 id="Zookeeper-分布式锁的原理"><a href="#Zookeeper-分布式锁的原理" class="headerlink" title="Zookeeper 分布式锁的原理"></a>Zookeeper 分布式锁的原理</h2><p>Zookeeper 分布式锁恰恰应用了临时顺序节点。具体如何实现呢？让我们来看一看详细步骤：</p>
+<h3 id="获取锁"><a href="#获取锁" class="headerlink" title="获取锁"></a>获取锁</h3><p>首先，在 Zookeeper 当中创建一个持久节点 ParentLock。当第一个客户端想要获得锁时，需要在 ParentLock 这个节点下面创建一个<strong>临时顺序节点</strong> Lock1。</p>
+<p><img src="https://www.funtl.com/assets/Lusifer201810190005.png" alt="img"></p>
+<p>之后，Client1 查找 ParentLock 下面所有的临时顺序节点并排序，判断自己所创建的节点 Lock1 是不是顺序最靠前的一个。如果是第一个节点，则成功获得锁。</p>
+<p><img src="https://www.funtl.com/assets/Lusifer201810190006.png" alt="img"></p>
+<p>这时候，如果再有一个客户端 Client2 前来获取锁，则在 ParentLock 下载再创建一个临时顺序节点 Lock2。</p>
+<p><img src="https://www.funtl.com/assets/Lusifer201810190007.png" alt="img"></p>
+<p>Client2 查找 ParentLock 下面所有的临时顺序节点并排序，判断自己所创建的节点 Lock2 是不是顺序最靠前的一个，结果发现节点 Lock2 并不是最小的。</p>
+<p>于是，Client2 向排序仅比它靠前的节点 Lock1 注册 Watcher，用于监听 Lock1 节点是否存在。这意味着 Client2 抢锁失败，进入了等待状态。</p>
+<p><img src="https://www.funtl.com/assets/Lusifer201810190008.png" alt="img"></p>
+<p>这时候，如果又有一个客户端 Client3 前来获取锁，则在 ParentLock 下载再创建一个临时顺序节点 Lock3。</p>
+<p><img src="https://www.funtl.com/assets/Lusifer201810190009.png" alt="img"></p>
+<p>Client3 查找 ParentLock 下面所有的临时顺序节点并排序，判断自己所创建的节点 Lock3 是不是顺序最靠前的一个，结果同样发现节点 Lock3 并不是最小的。</p>
+<p>于是，Client3 向排序仅比它靠前的节点 Lock2 注册 Watcher，用于监听 Lock2 节点是否存在。这意味着 Client3 同样抢锁失败，进入了等待状态。</p>
+<p><img src="https://www.funtl.com/assets/Lusifer201810190010.png" alt="img"></p>
+<p>这样一来，Client1 得到了锁，Client2 监听了 Lock1，Client3 监听了 Lock2。这恰恰形成了一个等待队列，</p>
+<h3 id="释放锁"><a href="#释放锁" class="headerlink" title="释放锁"></a>释放锁</h3><p>释放锁分为两种情况：</p>
+<h4 id="任务完成，客户端显示释放"><a href="#任务完成，客户端显示释放" class="headerlink" title="任务完成，客户端显示释放"></a>任务完成，客户端显示释放</h4><p>当任务完成时，Client1 会显示调用删除节点 Lock1 的指令。</p>
+<p><img src="https://www.funtl.com/assets/Lusifer201810190011.png" alt="img"></p>
+<h4 id="任务执行过程中，客户端崩溃"><a href="#任务执行过程中，客户端崩溃" class="headerlink" title="任务执行过程中，客户端崩溃"></a>任务执行过程中，客户端崩溃</h4><p>获得锁的 Client1 在任务执行过程中，如果崩溃，则会断开与 Zookeeper 服务端的链接。根据临时节点的特性，相关联的节点 Lock1 会随之自动删除。</p>
+<p><img src="https://www.funtl.com/assets/Lusifer201810190012.png" alt="img"></p>
+<p>由于 Client2 一直监听着 Lock1 的存在状态，当 Lock1 节点被删除，Client2 会立刻收到通知。这时候 Client2 会再次查询 ParentLock 下面的所有节点，确认自己创建的节点 Lock2 是不是目前最小的节点。如果是最小，则 Client2 顺理成章获得了锁。</p>
+<p><img src="https://www.funtl.com/assets/Lusifer201810190013.png" alt="img"></p>
+<p>同理，如果 Client2 也因为任务完成或者节点崩溃而删除了节点 Lock2，那么 Client3 就会接到通知。</p>
+<p><img src="https://www.funtl.com/assets/Lusifer201810190014.png" alt="img"></p>
+<p>最终，Client3 成功得到了锁。</p>
+<p><img src="https://www.funtl.com/assets/Lusifer201810190015.png" alt="img"></p>
+<h2 id="Zookeeper-和-Redis-分布式锁的比较"><a href="#Zookeeper-和-Redis-分布式锁的比较" class="headerlink" title="Zookeeper 和 Redis 分布式锁的比较"></a>Zookeeper 和 Redis 分布式锁的比较</h2><p><img src="https://www.funtl.com/assets/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20181019070014.jpg" alt="img"></p>
+
+  </article>
+  <footer class="f-cf">
+    
+      <a href="/2019/01/02/Spring-Boot-常用配置/" class="link f-fl">⟵Spring Boot 常用配置</a>
+    
+    
+      <a href="/2018/11/02/Zookeeper-配置说明/" class="link f-fr">Zookeeper 配置说明⟶</a>
+    
+  </footer>
+</section></div>
+    <footer id="footer" class="f-cf">
+  Email:1208087904@qq.com
+  
+    
+      
+        · <a href="https://weibo.com/u/6236494909?is_hot=1 || weibo" target="_blank" class="nav-icn">WeiBo</a>
+      
+    
+      
+        · <a href="https://www.zhihu.com/people/7757-43-90/activities" target="_blank" class="nav-icn">ZhiHu</a>
+      
+    
+  
+  <span class="copyright">All rights reserved @7757</span>
+</footer>
+  </div>
+</body>
+</html>

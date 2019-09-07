@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <title>Dubbo + Hystrix 熔断器仪表盘 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="使用熔断器仪表盘监控在 Provider 和 Consumer 项目增加 Hystrix 仪表盘功能，两个项目的改造方式相同 在 pom.xml 中增加依赖12345&amp;lt;dependency&amp;gt;    &amp;lt;groupId&amp;gt;org.springframework.cloud&amp;lt;/groupId&amp;gt;    &amp;lt;artifactId&amp;gt;spring-cloud-star">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Dubbo + Hystrix 熔断器仪表盘">
+<meta property="og:url" content="http://yoursite.com/2019/04/04/Dubbo-Hystrix-熔断器仪表盘/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="使用熔断器仪表盘监控在 Provider 和 Consumer 项目增加 Hystrix 仪表盘功能，两个项目的改造方式相同 在 pom.xml 中增加依赖12345&amp;lt;dependency&amp;gt;    &amp;lt;groupId&amp;gt;org.springframework.cloud&amp;lt;/groupId&amp;gt;    &amp;lt;artifactId&amp;gt;spring-cloud-star">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://yoursite.com/images/Hystrix.png">
+<meta property="og:updated_time" content="2019-09-07T13:00:29.125Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Dubbo + Hystrix 熔断器仪表盘">
+<meta name="twitter:description" content="使用熔断器仪表盘监控在 Provider 和 Consumer 项目增加 Hystrix 仪表盘功能，两个项目的改造方式相同 在 pom.xml 中增加依赖12345&amp;lt;dependency&amp;gt;    &amp;lt;groupId&amp;gt;org.springframework.cloud&amp;lt;/groupId&amp;gt;    &amp;lt;artifactId&amp;gt;spring-cloud-star">
+<meta name="twitter:image" content="http://yoursite.com/images/Hystrix.png">
+  
+  <link rel="stylesheet" href="/css/index.css">
+</head>
+</html>
+<body style="
+
+
+  background-color: #eff0f6
+
+">
+  <div id="container">
+    <nav id="nav">
+  <header class="header">
+    <a href="/" class="title">7757 BOLG</a>
+  </header>
+  <div class="ctnWrap">
+    <div class="icons">
+      
+        
+          
+            <a href="https://weibo.com/u/6236494909?is_hot=1 || weibo" target="_blank" class="nav-icn iconfont icon-weibo"></a>
+          
+        
+          
+            <a href="https://www.zhihu.com/people/7757-43-90/activities" target="_blank" class="nav-icn iconfont icon-zhihu"></a>
+          
+        
+      
+    </div>
+    <div class="menu">
+      
+        
+            <a href="/" class="nav-menu ">HOME</a>
+          
+        
+            <a href="/archives" class="nav-menu ">ARCHIVE</a>
+          
+        
+            <a href="/about" class="nav-menu ">ABOUT</a>
+          
+        
+      
+    </div>
+  </div>
+</nav>
+    <div id="main"><section class="article">
+  <h2 class="title">Dubbo + Hystrix 熔断器仪表盘</h2>
+  <p class="sub">Apr 4, 2019</p>
+  <article class="content">
+    <h2 id="使用熔断器仪表盘监控"><a href="#使用熔断器仪表盘监控" class="headerlink" title="使用熔断器仪表盘监控"></a>使用熔断器仪表盘监控</h2><p>在 Provider 和 Consumer 项目增加 Hystrix 仪表盘功能，两个项目的改造方式相同</p>
+<h2 id="在-pom-xml-中增加依赖"><a href="#在-pom-xml-中增加依赖" class="headerlink" title="在 pom.xml 中增加依赖"></a>在 <code>pom.xml</code> 中增加依赖</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;spring-cloud-starter-netflix-hystrix-dashboard&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;2.0.1.RELEASE&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="在-Application-中增加-EnableHystrixDashboard-注解"><a href="#在-Application-中增加-EnableHystrixDashboard-注解" class="headerlink" title="在 Application 中增加 @EnableHystrixDashboard 注解"></a>在 Application 中增加 <code>@EnableHystrixDashboard</code> 注解</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">package com.funtl.hello.dubbo.service.user.consumer;</span><br><span class="line"></span><br><span class="line">import org.springframework.boot.SpringApplication;</span><br><span class="line">import org.springframework.boot.autoconfigure.SpringBootApplication;</span><br><span class="line">import org.springframework.cloud.netflix.hystrix.EnableHystrix;</span><br><span class="line">import org.springframework.cloud.netflix.hystrix.dashboard.EnableHystrixDashboard;</span><br><span class="line"></span><br><span class="line">@EnableHystrix</span><br><span class="line">@EnableHystrixDashboard</span><br><span class="line">@SpringBootApplication</span><br><span class="line">public class HelloDubboServiceUserConsumerApplication &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        SpringApplication.run(HelloDubboServiceUserConsumerApplication.class, args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="创建-hystrix-stream-的-Servlet-配置"><a href="#创建-hystrix-stream-的-Servlet-配置" class="headerlink" title="创建 hystrix.stream 的 Servlet 配置"></a>创建 <code>hystrix.stream</code> 的 Servlet 配置</h2><p>Spring Boot 2.x 版本开启 Hystrix Dashboard 与 Spring Boot 1.x 的方式略有不同，需要增加一个 <code>HystrixMetricsStreamServlet</code> 的配置，代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">package com.funtl.hello.dubbo.service.user.consumer.config;</span><br><span class="line"></span><br><span class="line">import com.netflix.hystrix.contrib.metrics.eventstream.HystrixMetricsStreamServlet;</span><br><span class="line">import org.springframework.boot.web.servlet.ServletRegistrationBean;</span><br><span class="line">import org.springframework.context.annotation.Bean;</span><br><span class="line">import org.springframework.context.annotation.Configuration;</span><br><span class="line"></span><br><span class="line">@Configuration</span><br><span class="line">public class HystrixDashboardConfiguration &#123;</span><br><span class="line">    @Bean</span><br><span class="line">    public ServletRegistrationBean getServlet() &#123;</span><br><span class="line">        HystrixMetricsStreamServlet streamServlet = new HystrixMetricsStreamServlet();</span><br><span class="line">        ServletRegistrationBean registrationBean = new ServletRegistrationBean(streamServlet);</span><br><span class="line">        registrationBean.setLoadOnStartup(1);</span><br><span class="line">        registrationBean.addUrlMappings(&quot;/hystrix.stream&quot;);</span><br><span class="line">        registrationBean.setName(&quot;HystrixMetricsStreamServlet&quot;);</span><br><span class="line">        return registrationBean;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="测试-Hystrix-Dashboard"><a href="#测试-Hystrix-Dashboard" class="headerlink" title="测试 Hystrix Dashboard"></a>测试 Hystrix Dashboard</h2><p>浏览器端访问 <a href="http://localhost:9090/hystrix" target="_blank" rel="noopener">http://localhost:9090/hystrix</a> 界面如下：</p>
+<p><img src="https://www.funtl.com/assets/Lusifer_20181023054017.png" alt="img"></p>
+<p>点击 Monitor Stream，进入下一个界面，访问 <a href="http://localhost:9090/hi" target="_blank" rel="noopener">http://localhost:9090/hi</a> 触发熔断后，监控界面显示效果如下：</p>
+<p><img src="https://www.funtl.com/assets/Lusifer_20181023054151.png" alt="img"></p>
+<h2 id="附：Hystrix-说明"><a href="#附：Hystrix-说明" class="headerlink" title="附：Hystrix 说明"></a>附：Hystrix 说明</h2><h3 id="什么情况下会触发-fallback-方法"><a href="#什么情况下会触发-fallback-方法" class="headerlink" title="什么情况下会触发 fallback 方法"></a>什么情况下会触发 <code>fallback</code> 方法</h3><table>
+<thead>
+<tr>
+<th>名字</th>
+<th>描述</th>
+<th>触发fallback</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>EMIT</td>
+<td>值传递</td>
+<td>NO</td>
+</tr>
+<tr>
+<td>SUCCESS</td>
+<td>执行完成，没有错误</td>
+<td>NO</td>
+</tr>
+<tr>
+<td>FAILURE</td>
+<td>执行抛出异常</td>
+<td>YES</td>
+</tr>
+<tr>
+<td>TIMEOUT</td>
+<td>执行开始，但没有在允许的时间内完成</td>
+<td>YES</td>
+</tr>
+<tr>
+<td>BAD_REQUEST</td>
+<td>执行抛出HystrixBadRequestException</td>
+<td>NO</td>
+</tr>
+<tr>
+<td>SHORT_CIRCUITED</td>
+<td>断路器打开，不尝试执行</td>
+<td>YES</td>
+</tr>
+<tr>
+<td>THREAD_POOL_REJECTED</td>
+<td>线程池拒绝，不尝试执行</td>
+<td>YES</td>
+</tr>
+<tr>
+<td>SEMAPHORE_REJECTED</td>
+<td>信号量拒绝，不尝试执行</td>
+<td>YES</td>
+</tr>
+</tbody></table>
+<h3 id="fallback-方法在什么情况下会抛出异常"><a href="#fallback-方法在什么情况下会抛出异常" class="headerlink" title="fallback 方法在什么情况下会抛出异常"></a><code>fallback</code> 方法在什么情况下会抛出异常</h3><table>
+<thead>
+<tr>
+<th>名字</th>
+<th>描述</th>
+<th>抛异常</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>FALLBACK_EMIT</td>
+<td>Fallback值传递</td>
+<td>NO</td>
+</tr>
+<tr>
+<td>FALLBACK_SUCCESS</td>
+<td>Fallback执行完成，没有错误</td>
+<td>NO</td>
+</tr>
+<tr>
+<td>FALLBACK_FAILURE</td>
+<td>Fallback执行抛出出错</td>
+<td>YES</td>
+</tr>
+<tr>
+<td>FALLBACK_REJECTED</td>
+<td>Fallback信号量拒绝，不尝试执行</td>
+<td>YES</td>
+</tr>
+<tr>
+<td>FALLBACK_MISSING</td>
+<td>没有Fallback实例</td>
+<td>YES</td>
+</tr>
+</tbody></table>
+<h3 id="Hystrix-Dashboard-界面监控参数"><a href="#Hystrix-Dashboard-界面监控参数" class="headerlink" title="Hystrix Dashboard 界面监控参数"></a>Hystrix Dashboard 界面监控参数</h3><p><img src="https://www.funtl.com/assets/20171123110838020.png" alt="img"></p>
+<h3 id="Hystrix-常用配置信息"><a href="#Hystrix-常用配置信息" class="headerlink" title="Hystrix 常用配置信息"></a>Hystrix 常用配置信息</h3><h4 id="超时时间（默认1000ms，单位：ms）"><a href="#超时时间（默认1000ms，单位：ms）" class="headerlink" title="超时时间（默认1000ms，单位：ms）"></a>超时时间（默认1000ms，单位：ms）</h4><ul>
+<li><code>hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds</code>：在调用方配置，被该调用方的所有方法的超时时间都是该值，优先级低于下边的指定配置</li>
+<li><code>hystrix.command.HystrixCommandKey.execution.isolation.thread.timeoutInMilliseconds</code>：在调用方配置，被该调用方的指定方法（HystrixCommandKey 方法名）的超时时间是该值</li>
+</ul>
+<h4 id="线程池核心线程数"><a href="#线程池核心线程数" class="headerlink" title="线程池核心线程数"></a>线程池核心线程数</h4><ul>
+<li><code>hystrix.threadpool.default.coreSize</code>：默认为 10</li>
+</ul>
+<h4 id="Queue"><a href="#Queue" class="headerlink" title="Queue"></a>Queue</h4><ul>
+<li><code>hystrix.threadpool.default.maxQueueSize</code>：最大排队长度。默认 -1，使用 <code>SynchronousQueue</code>。其他值则使用 <code>LinkedBlockingQueue</code>。如果要从 -1 换成其他值则需重启，即该值不能动态调整，若要动态调整，需要使用到下边这个配置</li>
+<li><code>hystrix.threadpool.default.queueSizeRejectionThreshold</code>：排队线程数量阈值，默认为 5，达到时拒绝，如果配置了该选项，队列的大小是该队列</li>
+</ul>
+<p><strong>注意：</strong> 如果 <code>maxQueueSize=-1</code> 的话，则该选项不起作用</p>
+<h4 id="断路器"><a href="#断路器" class="headerlink" title="断路器"></a>断路器</h4><ul>
+<li><code>hystrix.command.default.circuitBreaker.requestVolumeThreshold</code>：当在配置时间窗口内达到此数量的失败后，进行短路。默认 20 个（10s 内请求失败数量达到 20 个，断路器开）</li>
+<li><code>hystrix.command.default.circuitBreaker.sleepWindowInMilliseconds</code>：短路多久以后开始尝试是否恢复，默认 5s</li>
+<li><code>hystrix.command.default.circuitBreaker.errorThresholdPercentage</code>：出错百分比阈值，当达到此阈值后，开始短路。默认 50%</li>
+</ul>
+<p>####fallback</p>
+<ul>
+<li><code>hystrix.command.default.fallback.isolation.semaphore.maxConcurrentRequests</code>：调用线程允许请求 <code>HystrixCommand.GetFallback()</code> 的最大数量，默认 10。超出时将会有异常抛出，注意：该项配置对于 THREAD 隔离模式也起作用</li>
+</ul>
+<h4 id="属性配置参数"><a href="#属性配置参数" class="headerlink" title="属性配置参数"></a>属性配置参数</h4><ul>
+<li>参数说明：<a href="https://github.com/Netflix/Hystrix/wiki/Configuration" target="_blank" rel="noopener">https://github.com/Netflix/Hystrix/wiki/Configuration</a></li>
+<li>HystrixProperty 参考代码：<a href="http://www.programcreek.com/java-api-examples/index.php?source_dir=Hystrix-master/hystrix-contrib/hystrix-javanica/src/test/java/com/netflix/hystrix/contrib/javanica/test/common/configuration/command/BasicCommandPropertiesTest.java" target="_blank" rel="noopener">http://www.programcreek.com/java-api-examples/index.php?source_dir=Hystrix-master/hystrix-contrib/hystrix-javanica/src/test/java/com/netflix/hystrix/contrib/javanica/test/common/configuration/command/BasicCommandPropertiesTest.java</a></li>
+</ul>
+
+  </article>
+  <footer class="f-cf">
+    
+    
+      <a href="/2019/04/03/Dubbo-Hystrix-实现服务熔断/" class="link f-fr">Dubbo Hystrix 实现服务熔断⟶</a>
+    
+  </footer>
+</section></div>
+    <footer id="footer" class="f-cf">
+  Email:1208087904@qq.com
+  
+    
+      
+        · <a href="https://weibo.com/u/6236494909?is_hot=1 || weibo" target="_blank" class="nav-icn">WeiBo</a>
+      
+    
+      
+        · <a href="https://www.zhihu.com/people/7757-43-90/activities" target="_blank" class="nav-icn">ZhiHu</a>
+      
+    
+  
+  <span class="copyright">All rights reserved @7757</span>
+</footer>
+  </div>
+</body>
+</html>
