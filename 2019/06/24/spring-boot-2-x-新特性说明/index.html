@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <title>spring boot 2.x 新特性说明 | 7757</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="1.基础环境升级 最低 JDK 8，支持 JDK 9，不再支持 Java 6 和 7。Spring Boot 2.0 要求 Java 8 作为最低版本，许多现有的 API 已更新，以利用 Java 8 的特性。例如，接口上的默认方法，函数回调以及新的 API，如 javax.time。 如果你正在使用 Java 7 或更早版本，则在开发 Spring Boot 2.0 应用程序之前，需要升级你的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spring boot 2.x 新特性说明">
+<meta property="og:url" content="http://yoursite.com/2019/06/24/spring-boot-2-x-新特性说明/index.html">
+<meta property="og:site_name" content="7757">
+<meta property="og:description" content="1.基础环境升级 最低 JDK 8，支持 JDK 9，不再支持 Java 6 和 7。Spring Boot 2.0 要求 Java 8 作为最低版本，许多现有的 API 已更新，以利用 Java 8 的特性。例如，接口上的默认方法，函数回调以及新的 API，如 javax.time。 如果你正在使用 Java 7 或更早版本，则在开发 Spring Boot 2.0 应用程序之前，需要升级你的">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://yoursite.com/images/springboot2.0.jpg">
+<meta property="og:updated_time" content="2019-10-13T12:31:20.040Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="spring boot 2.x 新特性说明">
+<meta name="twitter:description" content="1.基础环境升级 最低 JDK 8，支持 JDK 9，不再支持 Java 6 和 7。Spring Boot 2.0 要求 Java 8 作为最低版本，许多现有的 API 已更新，以利用 Java 8 的特性。例如，接口上的默认方法，函数回调以及新的 API，如 javax.time。 如果你正在使用 Java 7 或更早版本，则在开发 Spring Boot 2.0 应用程序之前，需要升级你的">
+<meta name="twitter:image" content="http://yoursite.com/images/springboot2.0.jpg">
+  
+    <link rel="icon" href="/images/favicon-16x16-next.png">
+  
+  <link rel="stylesheet" href="/css/index.css">
+</head>
+</html>
+<body style="
+
+
+  background-color: #eff0f6
+
+">
+  <div id="container">
+    <nav id="nav">
+  <header class="header">
+    <a href="/" class="title">7757 BOLG</a>
+  </header>
+  <div class="ctnWrap">
+    <div class="icons">
+      
+        
+          
+            <a href="https://www.zhihu.com/people/7757-43-90/activities" target="_blank" class="nav-icn iconfont icon-zhihu"></a>
+          
+        
+      
+    </div>
+    <div class="menu">
+      
+        
+            <a href="/" class="nav-menu ">HOME</a>
+          
+        
+            <a href="/archives" class="nav-menu ">ARCHIVE</a>
+          
+        
+            <a href="/about" class="nav-menu ">ABOUT</a>
+          
+        
+      
+    </div>
+  </div>
+</nav>
+    <div id="main"><section class="article">
+  <h2 class="title">spring boot 2.x 新特性说明</h2>
+  <p class="sub">Jun 24, 2019</p>
+  <article class="content">
+    <h2 id="1-基础环境升级"><a href="#1-基础环境升级" class="headerlink" title="1.基础环境升级"></a>1.基础环境升级</h2><ul>
+<li>最低 JDK 8，支持 JDK 9，不再支持 Java 6 和 7。Spring Boot 2.0 要求 Java 8 作为最低版本，许多现有的 API 已更新，以利用 Java 8 的特性。<br>例如，接口上的默认方法，函数回调以及新的 API，如 javax.time。</li>
+<li>如果你正在使用 Java 7 或更早版本，则在开发 Spring Boot 2.0 应用程序之前，需要升级你的 JDK。</li>
+</ul>
+<h2 id="2-依赖组件升级"><a href="#2-依赖组件升级" class="headerlink" title="2.依赖组件升级"></a>2.依赖组件升级</h2><ul>
+<li>Jetty 9.4，Jetty 是一个开源的 Servlet 容器，它为基于 Java 的 Web 内容，例如 JSP 和 Servlet 提供运行环境。Jetty 是使用 Java 语言编写的，它的 API 以一组 JAR 包的形式发布。</li>
+<li>Tomcat 8.5，Apache Tomcat 8.5.x 旨在取代 8.0.x，完全支持 Java 9。</li>
+<li>Flyway 5，Flyway 是独立于数据库的应用、管理并跟踪数据库变更的数据库版本管理工具。用通俗的话讲，Flyway 可以像 SVN 管理不同人的代码那样，管理不同人的 SQL 脚本，从而做到数据库同步。</li>
+<li>Hibernate 5.2，Hibernate 是一款非常流行的 ORM 框架。</li>
+<li>Gradle 3.4，Spring Boot 的 Gradle 插件在很大程度上已被重写，有了重大的改进。</li>
+<li>Thymeleaf 3.0，Thymeleaf 3 相对于 Thymeleaf 2 有非常大的性能提升。</li>
+</ul>
+<h2 id="3-默认软件替换"><a href="#3-默认软件替换" class="headerlink" title="3. 默认软件替换"></a>3. 默认软件替换</h2><ul>
+<li>默认数据库连接池已从 Tomcat 切换到 HikariCP，HikariCP 是一个高性能的 JDBC 连接池，Hikari 是日语“光”的意思。</li>
+<li>redis客户端默认使用 Lettuce，替换掉Jedis.Lettuce 是一个可伸缩的线程安全的 Redis 客户端，用于同步、异步和反应使用。多个线程可以共享同一个 RedisConnection，它利用优秀 Netty NIO 框架来高效地管理多个连接，支持先进的 Redis 功能，如 Sentinel、集群、流水线、自动重新连接和 Redis 数据模型。</li>
+</ul>
+<h2 id="4-新技术的引入"><a href="#4-新技术的引入" class="headerlink" title="4.新技术的引入"></a>4.新技术的引入</h2><ul>
+<li>响应式编程WebFlux,重要的变革,后续章节会详细展示</li>
+<li>支持 Quartz,Spring Boot 1.0 并没有提供对 Quartz 的支持，之前出现了各种集成方案，Spring Boot 2.0 给出了最简单的集成方式。</li>
+<li>对Kotlin 的支持</li>
+<li>JOOQ 的支持,JOOQ 是基于 Java 访问关系型数据库的工具包。JOOQ 既吸取了传统 ORM 操作数据的简单性和安全性，又保留了原生 SQL 的灵活性，它更像是介于 ORMS 和 JDBC 的中间层。</li>
+</ul>
+<h2 id="5-彩蛋"><a href="#5-彩蛋" class="headerlink" title="5.彩蛋"></a>5.彩蛋</h2><p>在 Spring Boot 1.0 项目中 src/main/resources 路径下新建一个 banner.txt 文件，文件中写入一些字符，启动项目时就会发现默认的 Banner 被替换了，到了 Spring Boot 2.0 现在可以支持 Gif 文件的打印，Spring Boot 2.0 在项目启动的时候，会将 Gif 图片的每一个画面，按照顺序打印在日志中，所有的画面打印完毕后，才会启动 Spring Boot 项目。</p>
+
+  </article>
+  <footer class="f-cf">
+    
+      <a href="/2019/09/25/RESTFul风格API详解—/" class="link f-fl">⟵RestFul风格API详解</a>
+    
+    
+      <a href="/2019/04/04/Dubbo-Hystrix-熔断器仪表盘/" class="link f-fr">Dubbo + Hystrix 熔断器仪表盘⟶</a>
+    
+  </footer>
+</section></div>
+    <footer id="footer" class="f-cf">
+  email:1208087904@qq.com
+  
+    
+      
+        · <a href="https://www.zhihu.com/people/7757-43-90/activities" target="_blank" class="nav-icn">ZhiHu</a>
+      
+    
+  
+  <span class="copyright">All rights reserved @7757</span>
+</footer>
+  </div>
+</body>
+</html>
